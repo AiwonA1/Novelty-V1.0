@@ -1,0 +1,154 @@
+Guide: Tracking FLOPs, Memory Usage, and Power Consumption for AI Models
+
+Summary
+
+This guide will walk you through how to track three important performance metrics for AI models—FLOPs (Floating Point Operations), memory usage, and power consumption—using widely available tools and methods. These metrics are crucial for understanding the computational demands and efficiency of your model, especially when optimizing for cost and performance. We will cover:
+
+	1.	FLOPs: Estimating floating point operations using TensorFlow, PyTorch, and other tools.
+	2.	Memory Usage: Monitoring GPU and CPU memory usage during training and inference.
+	3.	Power Consumption: Measuring energy consumption using NVIDIA DCGM and system-level tools.
+
+Before diving into each tool, we’ll outline the prerequisites and basic setup you’ll need.
+
+Before You Start
+
+To effectively track FLOPs, memory usage, and power consumption, make sure you have the following tools and environments set up:
+
+	1.	Hardware:
+	•	A machine with NVIDIA GPUs (for GPU-specific tracking) or CPUs.
+	•	Access to a cloud platform like AWS, Google Cloud, or Azure, or a local machine with relevant libraries installed.
+	2.	Software Frameworks:
+	•	Either TensorFlow or PyTorch (or your preferred machine learning framework).
+	•	CUDA drivers and cuDNN libraries for NVIDIA GPUs.
+	•	NVIDIA DCGM (Data Center GPU Manager) installed for power consumption tracking.
+	•	TensorBoard or PyTorch Profiling Tools for monitoring FLOPs and memory.
+	3.	System Monitoring Tools:
+	•	nvidia-smi for GPU memory and power usage.
+	•	htop/top for CPU monitoring.
+	•	Optionally, cloud-based monitoring tools if running on cloud infrastructure.
+
+Once you have the setup ready, you can follow the steps below to track each metric.
+
+Step 1: Tracking FLOPs
+
+Tracking FLOPs in TensorFlow
+
+	1.	Using TensorFlow Profiler:
+	•	TensorFlow provides a built-in profiler to estimate FLOPs. After running a model, you can view the FLOPs in the TensorBoard interface.
+	•	Add the profiler to your model:
+
+import tensorflow as tf
+from tensorflow.python.profiler.model_analyzer import profile
+from tensorflow.python.profiler.option_builder import ProfileOptionBuilder
+
+# Define your model and input data here
+model = ...  
+input_data = ...
+
+# Create session and run profiler
+with tf.Session() as sess:
+    tf.global_variables_initializer().run()
+    opts = ProfileOptionBuilder.float_operation()
+    flops = profile(sess.graph, options=opts)
+    print('FLOPs: ', flops.total_float_ops)
+
+
+	2.	TensorBoard Profiling:
+	•	Launch TensorBoard to monitor FLOPs over time:
+
+tensorboard --logdir ./logs
+
+
+	•	In TensorBoard, navigate to the Profile tab, where FLOPs will be listed alongside other performance metrics.
+
+Tracking FLOPs in PyTorch
+
+	1.	Using PyTorch-OpCounter:
+	•	Install the thop package:
+
+pip install thop
+
+
+	•	Measure FLOPs for a PyTorch model:
+
+from thop import profile
+model = ...  # Define your model
+input_data = ...  # Create a sample input tensor
+
+flops, params = profile(model, inputs=(input_data,))
+print(f'FLOPs: {flops}')
+
+
+
+Step 2: Monitoring Memory Usage
+
+Tracking Memory with nvidia-smi for GPUs
+
+	•	nvidia-smi is a powerful tool for monitoring GPU usage, including memory consumption. You can use it to monitor memory usage in real-time.
+
+nvidia-smi --query-gpu=memory.used,memory.total --format=csv
+
+This command will display the current and total GPU memory usage.
+
+	•	Live Monitoring:
+	•	Run the following to see a real-time snapshot every few seconds:
+
+watch -n 1 nvidia-smi
+
+
+
+Tracking CPU Memory Usage
+
+	•	Use top or htop to monitor system CPU and RAM usage:
+	•	For live monitoring:
+
+htop
+
+
+	•	You can sort processes by memory or CPU usage and identify any bottlenecks during model training or inference.
+
+Tracking Memory in TensorFlow and PyTorch
+
+	•	TensorFlow: Use the following code snippet to track memory usage:
+
+import tensorflow as tf
+tf.config.experimental.get_memory_info('GPU:0')
+
+
+	•	PyTorch: Track GPU memory usage with PyTorch:
+
+import torch
+print(f'Allocated: {torch.cuda.memory_allocated()} bytes')
+print(f'Cached: {torch.cuda.memory_reserved()} bytes')
+
+
+
+Step 3: Measuring Power Consumption
+
+Using NVIDIA DCGM (Data Center GPU Manager)
+
+	•	NVIDIA DCGM can track GPU power consumption during model training or inference. Install it from NVIDIA’s site.
+
+sudo apt install datacenter-gpu-manager
+
+Once installed, use the following command to monitor power consumption:
+
+dcgmi dmon -e 203
+
+	•	This command will output power usage for each GPU in watts. Use this while your model is running to monitor power consumption.
+
+Using nvidia-smi for Power Usage
+
+	•	You can also track GPU power consumption using nvidia-smi:
+
+nvidia-smi --query-gpu=power.draw --format=csv
+
+This will show the current power draw of each GPU in watts.
+
+Conclusion
+
+By following the steps in this guide, you’ll be able to effectively track the FLOPs, memory usage, and power consumption of your AI models, giving you valuable insights into performance and resource optimization. These metrics are crucial for improving the efficiency and scalability of your models, especially for large-scale deployments.
+
+Tracking these metrics is especially important for understanding how models like Novelty 1.0 perform in real-world settings, allowing you to optimize both costs and performance. As your models scale, this data will become key to ensuring that you maintain a balance between resource usage and output quality.
+
+This guide provides a detailed process to monitor these critical metrics in your AI model development. Let
