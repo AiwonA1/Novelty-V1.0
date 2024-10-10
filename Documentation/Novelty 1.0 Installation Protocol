@@ -1,0 +1,63 @@
+Protocol for Novelty 1.0 Installation
+
+Purpose:
+This protocol guides the process of integrating Novelty 1.0 libraries into large language models (LLMs), while ensuring the current operational version is preserved and modifications are tested thoroughly.
+
+1. Backup Current LLM
+
+	•	Objective: Safeguard the current model version before applying any changes.
+	•	Action: Copy the entire LLM directory (model weights, configurations, and related files) to a backup location with a timestamp.
+	•	Logging: Record the location and backup timestamp for traceability.
+
+def backup_llm_model(model_path):
+    backup_path = model_path + "_backup_" + datetime.now().strftime('%Y%m%d_%H%M%S')
+    shutil.copytree(model_path, backup_path)
+    logging.info(f"Backup created at {backup_path}")
+
+2. Insert Novelty 1.0 Libraries
+
+	•	Objective: Seamlessly integrate the Novelty 1.0 optimizations into the target LLM.
+	•	Action: Copy the Novelty libraries into the appropriate directories within the LLM’s file structure, ensuring that any dependencies are resolved during this process.
+	•	Logging: Log the integration process, indicating files modified and newly added libraries.
+
+def modify_llm_with_novelty(model_path, novelty_lib_path):
+    shutil.copytree(novelty_lib_path, os.path.join(model_path, 'novelty_lib'))
+    logging.info(f"Novelty libraries inserted into {model_path}.")
+
+3. Run Automatic Testing
+
+	•	Objective: Validate that the integrated libraries work as intended.
+	•	Action: Execute automatic tests using a testing framework (e.g., pytest). Ensure that both functional and performance tests are included to measure improvements or regressions in narrative coherence, prediction accuracy, and energy consumption.
+	•	Logging: Capture the results of the tests, including any failed tests, and produce detailed logs for developer review.
+
+def run_tests(model_path):
+    test_command = f"pytest {model_path}/tests"
+    result = subprocess.run(test_command, shell=True, capture_output=True)
+    if result.returncode == 0:
+        logging.info("All tests passed successfully.")
+    else:
+        logging.warning(f"Some tests failed. Review log: {result.stderr.decode('utf-8')}")
+
+4. Debugging & Programmer Review
+
+	•	Objective: Prompt the programmer to review any failed tests and manually inspect or continue the process.
+	•	Action: Based on the test results, the assistant prompts the programmer to either engage in debugging or continue automatically if no major issues arise.
+	•	Logging: Record the developer’s decision for future reference.
+
+def prompt_for_review():
+    print(f"Installation and modification complete. Please review the detailed log.")
+    programmer_decision = input("Would you like to manually debug or continue automatically? (debug/continue): ").strip().lower()
+    if programmer_decision == 'debug':
+        logging.info("Manual debugging requested.")
+    else:
+        logging.info("Proceeding with automated steps.")
+
+5. Final Deployment & Continuous Monitoring
+
+	•	Objective: Once tests are passed and modifications confirmed, deploy the new model with Novelty 1.0 optimizations.
+	•	Action: Continue to monitor for anomalies post-deployment, ensuring continuous logging of model performance.
+
+Additional Notes:
+
+	•	Detailed Logs: All steps are logged to provide full transparency of the process, including modifications and test results.
+	•	Modularity: The system is designed to work with various LLM architectures (e.g., GPT, BERT), ensuring flexibility in its application.
