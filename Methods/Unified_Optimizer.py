@@ -1,10 +1,16 @@
 # Unified LLM Optimization with On/Off Toggle, Parallelization, and Asynchronous Processing
 
 # This updated code integrates Active Inference, Story Management, Recursive Processing, and Quantum-Inspired Processing 
-# for optimizing an LLM’s output without causing input/output bottlenecks. Components run asynchronously and are parallelized 
-# where possible, ensuring smooth operation. The global 'optimizer_enabled' flag allows users to toggle the optimizer on or off 
-# based on system requirements, providing flexibility in performance control. The PerformanceTracker remains separate to 
-# monitor system performance, ensuring resource efficiency.
+# for optimizing an LLM’s output without causing input/output bottlenecks. The components are asynchronous and designed 
+# to run in parallel where possible, ensuring smooth operation. The 'optimizer_enabled' toggle allows users to enable or 
+# disable the optimizer. The PerformanceTracker remains separate to monitor system performance, ensuring resource efficiency.
+
+# Specific Insertion Points for Unified Optimizer Components:
+# 1. **Input Processing Layer**: After input tokenization to enable sentiment analysis and thematic tracking.
+# 2. **Model Decision-Making Layer**: Within the model's forward pass for dynamic prediction refinement using active inference.
+# 3. **Response Generation Layer**: Before generating the final output to implement recursive processing for feedback refinement.
+# 4. **Post-Processing Layer**: After response generation to evaluate multiple outputs and resolve ambiguities using quantum-inspired processing.
+# 5. **Performance Tracking Layer**: Throughout execution to log performance metrics and evaluate optimizer impact.
 
 import subprocess
 import torch
@@ -40,7 +46,7 @@ def toggle_optimizer(enable: bool):
     else:
         print("Optimizer disabled.")
 
-# ActiveInference class supports asynchronous operations for real-time decision making
+# ActiveInference class now supports asynchronous operations for real-time decision making
 class ActiveInference:
     def __init__(self):
         self.model = BayesianRidge()
