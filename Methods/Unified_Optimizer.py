@@ -1,10 +1,10 @@
-# Unified LLM Optimization with Parallelization and Asynchronous Processing
+# Unified LLM Optimization with On/Off Toggle, Parallelization, and Asynchronous Processing
 
 # This updated code integrates Active Inference, Story Management, Recursive Processing, and Quantum-Inspired Processing 
-# for optimizing an LLM’s output without causing input/output bottlenecks. The components are now asynchronous and designed 
-# to run in parallel where possible, enhancing real-time response without blocking execution. Asynchronous processing 
-# in key modules ensures smooth operation, and parallel tasks prevent bottlenecks in decision-making and response refinement.
-# The PerformanceTracker remains separate to monitor system performance, ensuring resource efficiency.
+# for optimizing an LLM’s output without causing input/output bottlenecks. Components run asynchronously and are parallelized 
+# where possible, ensuring smooth operation. The global 'optimizer_enabled' flag allows users to toggle the optimizer on or off 
+# based on system requirements, providing flexibility in performance control. The PerformanceTracker remains separate to 
+# monitor system performance, ensuring resource efficiency.
 
 import subprocess
 import torch
@@ -23,7 +23,24 @@ from typing import Tuple, Optional, List
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# ActiveInference class now supports asynchronous operations for real-time decision making
+# Global toggle for optimizer
+optimizer_enabled = True  # Default to enabled
+
+def toggle_optimizer(enable: bool):
+    """
+    Toggles the optimizer on or off based on user input.
+    
+    Args:
+        enable (bool): True to enable optimizer, False to disable.
+    """
+    global optimizer_enabled
+    optimizer_enabled = enable
+    if enable:
+        print("Optimizer enabled.")
+    else:
+        print("Optimizer disabled.")
+
+# ActiveInference class supports asynchronous operations for real-time decision making
 class ActiveInference:
     def __init__(self):
         self.model = BayesianRidge()
@@ -36,7 +53,7 @@ class ActiveInference:
         else:
             await asyncio.sleep(0.1)  # Simulate non-blocking processing
             self.model.fit(new_data.reshape(-1, 1), new_data)
-            self.current_beliefs = self.model.predict(new_data.reshape(-1,1))
+            self.current_beliefs = self.model.predict(new_data.reshape(-1, 1))
         logger.info("Beliefs updated using Bayesian inference.")
 
     async def predict_next(self, input_data: np.ndarray) -> np.ndarray:
@@ -126,27 +143,32 @@ class QuantumInspiredProcessor:
 
 # Unified workflow with parallel processing for optimal LLM response generation
 async def unified_workflow(input_data: str, feedback: str, conversation_history: list):
-    # Active Inference runs asynchronously
-    active_inference = ActiveInference()
-    prediction_task = asyncio.create_task(active_inference.predict_next(np.array([4.0])))
+    if optimizer_enabled:
+        print("Running with optimizer...")
+        # Active Inference runs asynchronously
+        active_inference = ActiveInference()
+        prediction_task = asyncio.create_task(active_inference.predict_next(np.array([4.0])))
 
-    # Story Manager tasks run asynchronously
-    story_manager = StoryManager()
-    theme_task = asyncio.create_task(story_manager.track_theme("Courage"))
-    character_task = asyncio.create_task(story_manager.develop_character("Alice", "Grows braver"))
-    plot_task = asyncio.create_task(story_manager.progress_plot("Alice encounters a forest"))
-    sentiment_task = asyncio.create_task(story_manager.analyze_sentiment(input_data))
+        # Story Manager tasks run asynchronously
+        story_manager = StoryManager()
+        theme_task = asyncio.create_task(story_manager.track_theme("Courage"))
+        character_task = asyncio.create_task(story_manager.develop_character("Alice", "Grows braver"))
+        plot_task = asyncio.create_task(story_manager.progress_plot("Alice encounters a forest"))
+        sentiment_task = asyncio.create_task(story_manager.analyze_sentiment(input_data))
 
-    # Recursive Processing
-    processor = RecursiveProcessor()
-    refine_task = asyncio.create_task(processor.recursive_refine(await prediction_task, feedback))
+        # Recursive Processing
+        processor = RecursiveProcessor()
+        refine_task = asyncio.create_task(processor.recursive_refine(await prediction_task, feedback))
 
-    # Quantum-Inspired Processing
-    quantum_processor = QuantumInspiredProcessor()
-    resolve_task = asyncio.create_task(quantum_processor.resolve_ambiguity(input_data))
-    sync_task = asyncio.create_task(quantum_processor.manage_long_range_dependencies(conversation_history))
+        # Quantum-Inspired Processing
+        quantum_processor = QuantumInspiredProcessor()
+        resolve_task = asyncio.create_task(quantum_processor.resolve_ambiguity(input_data))
+        sync_task = asyncio.create_task(quantum_processor.manage_long_range_dependencies(conversation_history))
 
-    await asyncio.gather(theme_task, character_task, plot_task, sentiment_task, refine_task, resolve_task, sync_task)
+        await asyncio.gather(theme_task, character_task, plot_task, sentiment_task, refine_task, resolve_task, sync_task)
+    else:
+        print("Running without optimizer...")
+        # Basic non-optimized LLM process goes here
 
 # PerformanceTracker remains separate and modular for monitoring system resources
 class PerformanceTracker:
@@ -176,6 +198,10 @@ if __name__ == "__main__":
     input_pytorch = torch.randn(1, 10)
     PerformanceTracker.track_flops_pytorch(model_pytorch, input_pytorch)
     PerformanceTracker.monitor_memory_nvidia_smi()
+
+    # Prompt to enable or disable optimizer
+    user_input = input("Enable optimizer? (yes/no): ")
+    toggle_optimizer(user_input.lower() == "yes")
 
     # Example asynchronous unified workflow
     asyncio.run(unified_workflow("I feel great today!", "Improve clarity", ["Hello", "How are you?"]))
