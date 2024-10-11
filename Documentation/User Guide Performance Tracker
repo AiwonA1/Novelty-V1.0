@@ -1,0 +1,58 @@
+Novelty 1.0 Performance Tracker - User Guide
+
+Overview
+
+The Novelty 1.0 Performance Tracker enables users to monitor system performance metrics while running LLM tasks with or without the unified optimizer. It tracks key metrics such as CPU usage, memory usage, GPU power, and memory. This tool is designed to help users assess the resource efficiency and performance impact of the optimizer.
+
+Key Features
+
+	•	Optimizer Toggle: Easily switch between optimized and non-optimized modes.
+	•	Metric Tracking: Logs system metrics like CPU, memory, and GPU usage during task execution.
+	•	Performance Comparison: Compares the performance of LLM tasks in both optimized and non-optimized modes.
+	•	Logging: Automatically saves performance metrics to a file for detailed analysis.
+
+Installation
+
+	1.	Ensure you have Python installed.
+	2.	Install the required dependencies:
+
+pip install psutil asyncio
+
+
+	3.	Ensure nvidia-smi is installed if you plan to track GPU usage on systems with NVIDIA GPUs.
+
+How to Use
+
+	1.	Run the Performance Tracker:
+After ensuring dependencies are installed, run the script:
+
+python performance_tracker.py
+
+This will execute the performance tracker and begin collecting system metrics.
+
+	2.	Toggle Optimizer:
+During runtime, the system will prompt you to enable or disable the optimizer:
+	•	Type yes to enable the optimizer.
+	•	Type no to run without optimization.
+	3.	Capture Metrics:
+The tracker will automatically log CPU, memory, and GPU usage while performing LLM tasks, capturing metrics in both modes for comparison.
+	4.	Review Logs:
+The performance metrics are saved to a text file (performance_logs.txt) for detailed analysis. Open this file to review the system’s performance in both modes.
+
+Example Workflow
+
+	1.	Run the script:
+
+python performance_tracker.py
+
+
+	2.	When prompted, select whether to enable the optimizer.
+	3.	The script will automatically run LLM tasks and capture system performance metrics in both modes.
+	4.	After completion, logs will be saved, and you can analyze the performance results in the performance_logs.txt file.
+
+Troubleshooting
+
+	•	GPU metrics not captured: Ensure nvidia-smi is installed and your system has an NVIDIA GPU.
+	•	High CPU or memory usage: Check if other intensive applications are running, which may affect performance metrics.
+
+This guide provides an easy-to-follow process for using the Novelty 1.0 Performance Tracker to assess and compare the performance of LLM tasks with and without optimization.
